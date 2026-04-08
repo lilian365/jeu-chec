@@ -1,0 +1,30 @@
+Lance une partie d'échecs en créant une instance de Chess et en appelant play()
+
+# ── Imports des modules du projet ────────────────────────────────────────────
+# IMPORTANT : on importe les classes, on ne copie-colle PAS leur code ici !
+from chess import Chess
+
+
+def main():
+    """Point d'entrée principal du programme."""
+
+    print("\n" + "=" * 50)
+    print("   JEU D'ÉCHECS – Version simplifiée (séance 4)")
+    print("=" * 50)
+
+    # Demander les noms des joueurs
+    nom_blanc = input("Nom du joueur avec les Blancs (♙) : ").strip() or "Alice"
+    nom_noir  = input("Nom du joueur avec les Noirs  (♟) : ").strip() or "Bob"
+
+    # Créer une instance de Chess avec les noms saisis
+    partie = Chess(nom_blanc, nom_noir)
+
+    # Lancer la partie – toute la logique est dans Chess.play()
+    partie.play()
+
+
+# ── Garde principale ─────────────────────────────────────────────────────────
+# Ce bloc s'exécute seulement si on lance ce fichier directement,
+# pas si on l'importe depuis un autre module.
+if __name__ == "__main__":
+    main()

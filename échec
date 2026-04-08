@@ -1,0 +1,154 @@
+# chess.py
+# Classe principale gérant le déroulement d'une partie d'échecs
+
+from board  import Board
+from player import Player
+
+
+class Chess:
+    """
+    Contrôleur principal de la partie d'échecs.
+
+    Responsabilités :
+        - Créer l'échiquier et les deux joueurs
+        - Gérer la boucle de jeu (alternance des tours)
+        - Détecter la fin de partie (échec et mat, abandon)
+
+    Attributs :
+        board         (Board)  : l'échiquier
+        players       (list)   : [joueur_blanc, joueur_noir]
+        currentPlayer (Player) : joueur dont c'est le tour
+        moveCount     (int)    : compteur de coups joués
+    """
+
+    MAX_MOVES = 200  # limite de sécurité pour éviter une boucle infinie
+
+    def __init__(self, player1_name: str = "Alice", player2_name: str = "Bob"):
+        """
+        Initialise une nouvelle partie.
+
+        Args:
+            player1_name (str): nom du joueur blanc (défaut "Alice")
+            player2_name (str): nom du joueur noir  (défaut "Bob")
+        """
+        self.board  = Board()
+        self.players = [
+            Player(player1_name, "white"),
+            Player(player2_name, "black"),
+        ]
+        self.currentPlayer = self.players[0]   # les blancs commencent
+        self.moveCount     = 0
+
+    # ------------------------------------------------------------------
+    # Boucle de jeu
+    # ------------------------------------------------------------------
+
+    def play(self):
+        """
+        Lance et gère la boucle principale de jeu.
+
+        La partie se termine quand :
+            - isCheckMate() retourne True  (pas encore implémenté → toujours False)
+            - Un joueur tape 'quit' pour abandonner
+            - On atteint MAX_MOVES coups (sécurité)
+        """
+        print("=" * 50)
+        print("     Bienvenue dans le jeu d'Échecs !  ♟")
+        print("=" * 50)
+        print(f"  {self.players[0].name} (♙ Blancs) vs {self.players[1].name} (♟ Noirs)")
+        print("  Tapez 'quit' pour abandonner.\n")
+
+        self.board.display()
+
+        while self.moveCount < self.MAX_MOVES:
+
+            # Vérification échec et mat (version simplifiée : toujours False)
+            if self.isCheckMate():
+                winner = self._otherPlayer()
+                print(f"Échec et mat ! {winner.name} remporte la partie !")
+                break
+
+            # Tour du joueur courant
+            print(f"Tour {self.moveCount + 1} – ", end="")
+            moved = self._playTurn()
+
+            if moved is None:
+                # Le joueur a tapé 'quit' → abandon
+                winner = self._otherPlayer()
+                print(f"{self.currentPlayer.name} abandonne. {winner.name} gagne !")
+                break
+
+            if moved:
+                self.moveCount += 1
+                self.board.display()
+                self._switchPlayer()
+        else:
+            print(f"Limite de {self.MAX_MOVES} coups atteinte. Match nul !")
+
+        print("Fin de la partie. Merci d'avoir joué !")
+
+    def _playTurn(self) -> bool | None:
+        """
+        Gère un tour : demande un coup au joueur courant et tente de l'exécuter.
+
+        Returns:
+            True  : coup joué avec succès
+            False : coup invalide (le joueur doit rejouer)
+            None  : le joueur a abandonné ('quit')
+        """
+        try:
+            origin, destination = self.currentPlayer.getMove()
+        except (EOFError, KeyboardInterrupt):
+            return None
+
+        # Interception de l'abandon
+        # (getMove lève une exception ou retourne une valeur spéciale – ici on
+        #  intercepte directement la chaîne 'quit' via une astuce dans Player)
+
+        piece = self.board.getPiece(origin)
+
+        # Vérifier que la pièce appartient bien au joueur courant
+        if piece is None or piece.color != self.currentPlayer.color:
+            print("Cette case ne contient pas votre pièce !")
+            return False
+
+        success = self.board.movePiece(origin, destination)
+        return success
+
+    # ------------------------------------------------------------------
+    # Règles de fin de partie
+    # ------------------------------------------------------------------
+
+    def isCheckMate(self) -> bool:
+        """
+        Vérifie si le joueur courant est en échec et mat.
+
+        Version simplifiée (séance 3) : retourne toujours False.
+        Sera complétée lors des séances suivantes.
+
+        Returns:
+            bool : True si échec et mat, False sinon.
+        """
+        return False   # Version simplifiée – à compléter plus tard
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    def _switchPlayer(self):
+        """Passe au joueur suivant."""
+        if self.currentPlayer == self.players[0]:
+            self.currentPlayer = self.players[1]
+        else:
+            self.currentPlayer = self.players[0]
+
+    def _otherPlayer(self) -> Player:
+        """Retourne le joueur qui n'est PAS le joueur courant."""
+        if self.currentPlayer == self.players[0]:
+            return self.players[1]
+        return self.players[0]
+
+    def __repr__(self) -> str:
+        return (f"Chess(joueur_blanc={self.players[0].name!r}, "
+                f"joueur_noir={self.players[1].name!r}, "
+                f"coups={self.moveCount})")

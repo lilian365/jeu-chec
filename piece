@@ -1,0 +1,54 @@
+# piece.py
+# Classe de base représentant une pièce d'échecs
+
+class Piece:
+    """
+    Classe de base pour toutes les pièces d'échecs.
+    
+    Attributs :
+        color  (str)  : couleur de la pièce, "white" ou "black"
+        symbol (str)  : symbole Unicode pour affichage
+        position (tuple) : position (ligne, colonne) sur l'échiquier, ex: (0, 0)
+    """
+
+    def __init__(self, color: str, position: tuple):
+        """
+        Initialise une pièce.
+
+        Args:
+            color    (str)   : "white" ou "black"
+            position (tuple) : (ligne, colonne), ex: (0, 4)
+        """
+        if color not in ("white", "black"):
+            raise ValueError(f"Couleur invalide : '{color}'. Doit être 'white' ou 'black'.")
+        self.color = color
+        self.position = position   # (ligne, colonne)
+        self.symbol = "?"          # sera surchargé dans les sous-classes
+
+    def isValidMove(self, destination: tuple, board) -> bool:
+        """
+        Vérifie si un déplacement vers 'destination' est légal.
+        
+        Version simplifiée (séance 3) : retourne toujours True.
+        Sera surchargée dans chaque sous-classe lors des séances suivantes.
+
+        Args:
+            destination (tuple) : case cible (ligne, colonne)
+            board               : référence vers l'objet Board (pas encore utilisé ici)
+
+        Returns:
+            bool : True si le mouvement est valide, False sinon.
+        """
+        return True   # Version simplifiée – à compléter plus tard
+
+    def move(self, destination: tuple):
+        """
+        Déplace la pièce vers la case destination.
+
+        Args:
+            destination (tuple) : nouvelle position (ligne, colonne)
+        """
+        self.position = destination
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.color}, {self.position})"

@@ -1,0 +1,161 @@
+# board.py
+# Classe représentant l'échiquier 8x8
+
+from pieces import King, Queen, Rook, Bishop, Knight, Pawn
+
+
+class Board:
+    """
+    Représente l'échiquier 8x8.
+
+    L'échiquier est stocké comme une liste de 8 listes (lignes).
+    board.grid[ligne][colonne] contient soit une Piece, soit None.
+
+    Convention de coordonnées :
+        ligne 0 = rangée des noires (pièces noires lourdes)
+        ligne 7 = rangée des blancs (pièces blanches lourdes)
+        colonne 0 = colonne 'a', colonne 7 = colonne 'h'
+    """
+
+    SIZE = 8  # taille de l'échiquier
+
+    def __init__(self):
+        """Crée un échiquier vide puis y place les pièces en position initiale."""
+        # Grille 8x8 initialisée à None
+        self.grid = [[None for _ in range(self.SIZE)] for _ in range(self.SIZE)]
+        self._setupPieces()
+
+    # ------------------------------------------------------------------
+    # Mise en place des pièces
+    # ------------------------------------------------------------------
+
+    def _setupPieces(self):
+        """Place toutes les pièces en position de départ standard."""
+
+        # ── Pièces noires (ligne 0 et 1) ──────────────────────────────
+        self.grid[0][0] = Rook   ("black", (0, 0))
+        self.grid[0][1] = Knight ("black", (0, 1))
+        self.grid[0][2] = Bishop ("black", (0, 2))
+        self.grid[0][3] = Queen  ("black", (0, 3))
+        self.grid[0][4] = King   ("black", (0, 4))
+        self.grid[0][5] = Bishop ("black", (0, 5))
+        self.grid[0][6] = Knight ("black", (0, 6))
+        self.grid[0][7] = Rook   ("black", (0, 7))
+        for col in range(self.SIZE):
+            self.grid[1][col] = Pawn("black", (1, col))
+
+        # ── Pièces blanches (ligne 7 et 6) ────────────────────────────
+        self.grid[7][0] = Rook   ("white", (7, 0))
+        self.grid[7][1] = Knight ("white", (7, 1))
+        self.grid[7][2] = Bishop ("white", (7, 2))
+        self.grid[7][3] = Queen  ("white", (7, 3))
+        self.grid[7][4] = King   ("white", (7, 4))
+        self.grid[7][5] = Bishop ("white", (7, 5))
+        self.grid[7][6] = Knight ("white", (7, 6))
+        self.grid[7][7] = Rook   ("white", (7, 7))
+        for col in range(self.SIZE):
+            self.grid[6][col] = Pawn("white", (6, col))
+
+    # ------------------------------------------------------------------
+    # Accès à la grille
+    # ------------------------------------------------------------------
+
+    def getPiece(self, position: tuple):
+        """
+        Retourne la pièce à la position donnée, ou None si la case est vide.
+
+        Args:
+            position (tuple): (ligne, colonne)
+
+        Returns:
+            Piece | None
+        """
+        ligne, col = position
+        return self.grid[ligne][col]
+
+    def setPiece(self, position: tuple, piece):
+        """
+        Place (ou retire) une pièce sur la case indiquée.
+
+        Args:
+            position (tuple): (ligne, colonne)
+            piece           : Piece ou None
+        """
+        ligne, col = position
+        self.grid[ligne][col] = piece
+
+    def isInsideBoard(self, position: tuple) -> bool:
+        """
+        Vérifie que la position est bien à l'intérieur de l'échiquier.
+
+        Args:
+            position (tuple): (ligne, colonne)
+
+        Returns:
+            bool
+        """
+        ligne, col = position
+        return 0 <= ligne < self.SIZE and 0 <= col < self.SIZE
+
+    def movePiece(self, origin: tuple, destination: tuple) -> bool:
+        """
+        Déplace la pièce depuis 'origin' vers 'destination' si le mouvement
+        est valide selon la méthode isValidMove() de la pièce.
+
+        Args:
+            origin      (tuple): case de départ  (ligne, colonne)
+            destination (tuple): case d'arrivée  (ligne, colonne)
+
+        Returns:
+            bool : True si le déplacement a été effectué, False sinon.
+        """
+        # Vérification que les cases existent
+        if not self.isInsideBoard(origin) or not self.isInsideBoard(destination):
+            print("Position hors de l'échiquier !")
+            return False
+
+        piece = self.getPiece(origin)
+
+        # Pas de pièce à déplacer
+        if piece is None:
+            print("Aucune pièce sur la case d'origine !")
+            return False
+
+        # Validation du mouvement (version simplifiée : toujours True)
+        if not piece.isValidMove(destination, self):
+            print("Mouvement invalide !")
+            return False
+
+        # Effectuer le déplacement
+        self.setPiece(destination, piece)   # place la pièce sur l'arrivée
+        self.setPiece(origin, None)         # vide la case de départ
+        piece.move(destination)             # met à jour la position interne
+
+        return True
+
+    # ------------------------------------------------------------------
+    # Affichage
+    # ------------------------------------------------------------------
+
+    def display(self):
+        """Affiche l'échiquier dans le terminal avec symboles Unicode."""
+        print()
+        print("    a  b  c  d  e  f  g  h")
+        print("  ┌──┬──┬──┬──┬──┬──┬──┬──┐")
+        for ligne in range(self.SIZE):
+            # Numéro de rangée (8 en haut, 1 en bas – convention échecs)
+            rang = self.SIZE - ligne
+            row_str = f"{rang} │"
+            for col in range(self.SIZE):
+                piece = self.grid[ligne][col]
+                if piece is None:
+                    # Couleur de la case : clair ou foncé
+                    row_str += "· │" if (ligne + col) % 2 == 0 else "  │"
+                else:
+                    row_str += f"{piece.symbol} │"
+            print(row_str)
+            if ligne < self.SIZE - 1:
+                print("  ├──┼──┼──┼──┼──┼──┼──┼──┤")
+        print("  └──┴──┴──┴──┴──┴──┴──┴──┘")
+        print("    a  b  c  d  e  f  g  h")
+        print()

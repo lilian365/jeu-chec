@@ -1,0 +1,82 @@
+# player.py
+# Classe représentant un joueur humain
+
+class Player:
+    """
+    Représente un joueur humain.
+
+    Attributs :
+        name  (str) : prénom / pseudo du joueur
+        color (str) : "white" ou "black"
+    """
+
+    def __init__(self, name: str, color: str):
+        """
+        Initialise un joueur.
+
+        Args:
+            name  (str): nom du joueur
+            color (str): "white" ou "black"
+        """
+        if color not in ("white", "black"):
+            raise ValueError(f"Couleur invalide : '{color}'.")
+        self.name  = name
+        self.color = color
+
+    def getMove(self) -> tuple:
+        """
+        Demande au joueur de saisir son coup au clavier.
+        Format attendu : 'e2 e4'  (case_origine espace case_destination)
+
+        Returns:
+            tuple: (origine, destination) où chaque élément est (ligne, col)
+        """
+        while True:
+            try:
+                raw = input(f"{self.name} ({self.color}) – entrez votre coup (ex: e2 e4) : ").strip()
+                parts = raw.lower().split()
+                if len(parts) != 2:
+                    raise ValueError
+                origin      = self._parseCase(parts[0])
+                destination = self._parseCase(parts[1])
+                return origin, destination
+            except ValueError:
+                print("Format invalide. Utilisez le format 'e2 e4' (lettre + chiffre).")
+
+    @staticmethod
+    def _parseCase(case: str) -> tuple:
+        """
+        Convertit une case en notation algébrique (ex: 'e2') en (ligne, colonne).
+
+        La notation algébrique utilise :
+            - lettre : colonne  a=0 … h=7
+            - chiffre : rangée  1=ligne 7 … 8=ligne 0
+
+        Args:
+            case (str): ex 'e2'
+
+        Returns:
+            tuple: (ligne, colonne)
+
+        Raises:
+            ValueError: si la case est mal formée ou hors limites.
+        """
+        if len(case) != 2:
+            raise ValueError(f"Case invalide : '{case}'")
+
+        col_char = case[0]
+        row_char = case[1]
+
+        if col_char not in "abcdefgh" or not row_char.isdigit():
+            raise ValueError(f"Case invalide : '{case}'")
+
+        col  = ord(col_char) - ord('a')     # 'a'→0, 'b'→1, …, 'h'→7
+        rang = int(row_char)                # 1 à 8
+        if not (1 <= rang <= 8):
+            raise ValueError(f"Rangée hors limites : {rang}")
+
+        ligne = 8 - rang                    # rangée 8 → ligne 0, rangée 1 → ligne 7
+        return (ligne, col)
+
+    def __repr__(self) -> str:
+        return f"Player(name={self.name!r}, color={self.color!r})"
