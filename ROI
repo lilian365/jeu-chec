@@ -1,0 +1,25 @@
+class King(Piece):
+   
+    def __init__(self, color: str, position: tuple):
+        super().__init__(color, position)
+        self.symbol = "♔" if color == "white" else "♚"
+
+    def isValidMove(self, destination: tuple, board) -> bool:
+        """
+   
+        ligne_orig, col_orig = self.position
+        ligne_dest, col_dest = destination
+
+        d_ligne = abs(ligne_dest - ligne_orig)
+        d_col   = abs(col_dest  - col_orig)
+
+        # Le roi avance au maximum d'une case dans n'importe quelle direction
+        if d_ligne > 1 or d_col > 1 or (d_ligne == 0 and d_col == 0):
+            return False
+
+        # Ne peut pas capturer une de ses propres pièces
+        piece_dest = board.getPiece(destination)
+        if piece_dest is not None and piece_dest.color == self.color:
+            return False
+
+        return True
