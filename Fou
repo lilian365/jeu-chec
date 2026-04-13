@@ -1,0 +1,33 @@
+class Bishop(Piece):
+
+    def __init__(self, color: str, position: tuple):
+        super().__init__(color, position)
+        self.symbol = "♗" if color == "white" else "♝"
+
+    def isValidMove(self, destination: tuple, board) -> bool:
+    
+        """
+        ligne_orig, col_orig = self.position
+        ligne_dest, col_dest = destination
+
+        d_ligne = ligne_dest - ligne_orig
+        d_col   = col_dest  - col_orig
+
+        # Doit se déplacer
+        if d_ligne == 0 and d_col == 0:
+            return False
+
+        # Diagonale parfaite : |Δligne| == |Δcol|
+        if abs(d_ligne) != abs(d_col):
+            return False
+
+        # Chemin dégagé
+        if not _chemin_libre(self.position, destination, board):
+            return False
+
+        # Ne peut pas capturer une de ses propres pièces
+        piece_dest = board.getPiece(destination)
+        if piece_dest is not None and piece_dest.color == self.color:
+            return False
+
+        return True
