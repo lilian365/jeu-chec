@@ -1,0 +1,46 @@
+# pieces.py
+# Sous-classes concrètes : Roi, Dame, Tour, Fou, Cavalier, Pion
+
+from piece import Piece
+
+
+class King(Piece):
+    """Le Roi – la pièce la plus importante."""
+    def __init__(self, color: str, position: tuple):
+        super().__init__(color, position)
+        self.symbol = "♔" if color == "white" else "♚"
+
+
+class Queen(Piece):
+    """La Dame – la pièce la plus puissante."""
+    def __init__(self, color: str, position: tuple):
+        super().__init__(color, position)
+        self.symbol = "♕" if color == "white" else "♛"
+
+
+class Rook(Piece):
+    """La Tour."""
+    def __init__(self, color: str, position: tuple):
+        super().__init__(color, position)
+        self.symbol = "♖" if color == "white" else "♜"
+
+
+class Bishop(Piece):
+    """Le Fou."""
+    def __init__(self, color: str, position: tuple):
+        super().__init__(color, position)
+        self.symbol = "♗" if color == "white" else "♝"
+
+
+class Knight(Piece):
+    """Le Cavalier."""
+    def __init__(self, color: str, position: tuple):
+        super().__init__(color, position)
+        self.symbol = "♘" if color == "white" else "♞"
+
+
+class Pawn(Piece):
+    """Le Pion."""
+    def __init__(self, color: str, position: tuple):
+        super().__init__(color, position)
+        self.symbol = "♙" if color == "white" else "♟"
